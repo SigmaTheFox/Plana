@@ -1,2 +1,4 @@
 node_modules/
 settings/config.json
+json/localization.json
+json/students.json
