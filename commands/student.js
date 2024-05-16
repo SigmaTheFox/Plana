@@ -7,6 +7,9 @@ const {
 } = require('discord.js');
 const { readFileSync } = require('fs');
 
+const localization = require('../json/localization.json');
+const emotes = require('../json/emotes.json');
+
 let students = JSON.parse(readFileSync('./json/students.json'));
 let validStudentNames = students.map(student => student.Name);
 
@@ -42,6 +45,54 @@ module.exports = {
 		const userInput = interaction.options.getString('name');
 		const student = students.find(student => student.Name === userInput);
 
-		interaction.reply(student.Name);
+		const embedPage1 = new EmbedBuilder()
+			.setThumbnail(
+				`https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/${student.Id}.webp`
+			)
+			.setTitle(student.Name)
+			.addFields([
+				{ name: 'Rarity', value: '⭐'.repeat(student.StarGrade), inline: true },
+				{ name: 'School', value: localization['School'][student.School], inline: true },
+				{ name: 'Club', value: localization['Club'][student.Club], inline: true },
+				{
+					name: 'Squad Type',
+					value: localization['SquadType'][student.SquadType],
+					inline: true,
+				},
+				{
+					name: 'Role',
+					value: localization['TacticRole'][student.TacticRole],
+					inline: true,
+				},
+				{ name: 'Position', value: student.Position, inline: true },
+				{
+					name: 'Attack Type',
+					value: localization['BulletType'][student.BulletType],
+					inline: true,
+				},
+				{
+					name: 'Armor Type',
+					value: localization['ArmorType'][student.ArmorType],
+					inline: true,
+				},
+				{ name: '\u200b', value: '\u200b', inline: true },
+				{
+					name: 'Urban',
+					value: emotes['affinity' + student.StreetBattleAdaptation],
+					inline: true,
+				},
+				{
+					name: 'Outdoor',
+					value: emotes['affinity' + student.OutdoorBattleAdaptation],
+					inline: true,
+				},
+				{
+					name: 'Indoor',
+					value: emotes['affinity' + student.IndoorBattleAdaptation],
+					inline: true,
+				},
+			]);
+
+		interaction.reply({ embeds: [embedPage1] });
 	},
 };
