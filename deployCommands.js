@@ -10,7 +10,7 @@ const commandFiles = readdirSync('./commands/').filter(file => file.endsWith('.j
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	if (command.private === true) privateCommands.push(command.data.toJSON());
-	else commands.push(command.data.toJSON());
+	else commands.push({ ...command.data, integration_types: [0, 1], contexts: [0, 1, 2] });
 }
 
 const rest = new REST().setToken(token);
