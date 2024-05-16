@@ -1,18 +1,15 @@
 const {
 	SlashCommandBuilder,
 	Client,
-	ComamndInteraction,
-	PermissionFlagsBits: { Administrator },
 	AutocompleteInteraction,
 	CommandInteraction,
 } = require('discord.js');
-const { execute } = require('./ping');
 
 module.exports = {
+	private: true,
 	data: new SlashCommandBuilder()
 		.setName('reload')
 		.setDescription('Reloads a command')
-		.setDefaultMemberPermissions(Administrator)
 		.addStringOption(opt =>
 			opt
 				.setName('command')
