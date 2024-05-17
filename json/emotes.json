@@ -1,8 +1,36 @@
 {
-	"affinity5": "😎",
-	"affinity4": "😆",
-	"affinity3": "🙂",
-	"affinity2": "😐",
-	"affinity1": "🙁",
-	"affinity0": "😣"
+	"userInstall": {
+		"affinity5": "😎",
+		"affinity4": "😆",
+		"affinity3": "🙂",
+		"affinity2": "😐",
+		"affinity1": "🙁",
+		"affinity0": "😣",
+		"Badge": "Badge",
+		"Bag": "Bag",
+		"Charm": "Charm",
+		"Gloves": "Gloves",
+		"Hairpin": "Hairpin",
+		"Hat": "Hat",
+		"Necklace": "Necklace",
+		"Shoes": "Shoes",
+		"Watch": "Wristwatch"
+	},
+	"serverInstall": {
+		"affinity5": "<:AffinitySS:1240713630803169300>",
+		"affinity4": "<:AffinityS:1240713625782587524>",
+		"affinity3": "<:AffinityA:1240713629133832242>",
+		"affinity2": "<:AffinityB:1240713634393624657>",
+		"affinity1": "<:AffinityC:1240713627497926656>",
+		"affinity0": "<:AffinityD:1240713632346800310>",
+		"Badge": "<:equipment_badge:1240915377345658984>",
+		"Bag": "<:equipment_bag:1240915379547672626>",
+		"Charm": "<:equipment_amulet:1240915373889552394>",
+		"Gloves": "<:equipment_gloves:1240915383796367420>",
+		"Hairpin": "<:equipment_hairpin:1240915375995097098>",
+		"Hat": "<:equipment_hat:1240915385914757130>",
+		"Necklace": "<:equipment_necklace:1240915369611362357>",
+		"Shoes": "<:equipment_shoes:1240915381875380336>",
+		"Watch": "<:equipment_wristwatch:1240915371796725811>"
+	}
 }

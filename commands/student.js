@@ -7,10 +7,11 @@ const {
 	ButtonBuilder,
 	ButtonStyle,
 	ActionRowBuilder,
+	PermissionFlagsBits: { UseExternalEmojis },
 } = require('discord.js');
 const { readFileSync } = require('fs');
 
-const emotes = require('../json/emotes.json');
+const emotesList = require('../json/emotes.json');
 
 let localization = JSON.parse(readFileSync('./json/localization.json'));
 let students = JSON.parse(readFileSync('./json/students.json'));
@@ -45,6 +46,11 @@ module.exports = {
 	 * @param {CommandInteraction} interaction
 	 */
 	async execute(bot, interaction) {
+		let emotes;
+		if (interaction.inGuild() && interaction.appPermissions.has(UseExternalEmojis))
+			emotes = emotesList.serverInstall;
+		else emotes = emotesList.userInstall;
+
 		const backButton = new ButtonBuilder()
 			.setStyle(ButtonStyle.Secondary)
 			.setLabel('Back')
@@ -68,7 +74,7 @@ module.exports = {
 			.setTitle(student.Name);
 
 		const msg = await interaction.reply({
-			embeds: [embed.setFields(embedPages(student)[0]).setFooter({ text: 'Page 1' })],
+			embeds: [embed.setFields(embedPages(student, emotes)[0]).setFooter({ text: 'Page 1' })],
 			components: [new ActionRowBuilder().addComponents([forwardButton])],
 		});
 
@@ -84,7 +90,7 @@ module.exports = {
 			await interaction.update({
 				embeds: [
 					embed
-						.setFields(embedPages(student)[pageIndex])
+						.setFields(embedPages(student, emotes)[pageIndex])
 						.setFooter({ text: `Page ${pageIndex + 1}` }),
 				],
 				components: [
@@ -101,7 +107,7 @@ module.exports = {
 	},
 };
 
-function embedPages(student) {
+function embedPages(student, emotes) {
 	const pages = {
 		0: [
 			{ name: 'Rarity', value: '⭐'.repeat(student.StarGrade), inline: true },
@@ -145,8 +151,19 @@ function embedPages(student) {
 				inline: true,
 			},
 			{
-				name: 'Equipment',
-				value: student.Equipment.join(', '),
+				name: 'Equipment 1',
+				value: emotes[student.Equipment[0]],
+				inline: true,
+			},
+			{
+				name: 'Equipment 2',
+				value: emotes[student.Equipment[1]],
+				inline: true,
+			},
+			{
+				name: 'Equipment 3',
+				value: emotes[student.Equipment[2]],
+				inline: true,
 			},
 		],
 		1: [
