@@ -47,7 +47,7 @@ module.exports = {
 	 */
 	async execute(bot, interaction) {
 		let emotes;
-		if (interaction.inGuild() && interaction.appPermissions.has(UseExternalEmojis))
+		if (interaction.inCachedGuild() && interaction.appPermissions.has(UseExternalEmojis))
 			emotes = emotesList.serverInstall;
 		else emotes = emotesList.userInstall;
 
@@ -74,7 +74,12 @@ module.exports = {
 			.setTitle(student.Name);
 
 		const msg = await interaction.reply({
-			embeds: [embed.setFields(embedPages(student, emotes)[0]).setFooter({ text: 'Page 1' })],
+			embeds: [
+				embed
+					.setFields(embedPages(student, emotes)[0])
+					.setFooter({ text: 'Page 1' })
+					.setDescription(student.ProfileIntroduction),
+			],
 			components: [new ActionRowBuilder().addComponents([forwardButton])],
 		});
 
@@ -91,7 +96,8 @@ module.exports = {
 				embeds: [
 					embed
 						.setFields(embedPages(student, emotes)[pageIndex])
-						.setFooter({ text: `Page ${pageIndex + 1}` }),
+						.setFooter({ text: `Page ${pageIndex + 1}` })
+						.setDescription(pageIndex === 0 ? student.ProfileIntroduction : '\u200b'),
 				],
 				components: [
 					new ActionRowBuilder().addComponents([
@@ -110,9 +116,28 @@ module.exports = {
 function embedPages(student, emotes) {
 	const pages = {
 		0: [
+			{
+				name: 'Full Name',
+				value: `${student.FamilyName} ${student.PersonalName}`,
+				inline: true,
+			},
 			{ name: 'Rarity', value: '⭐'.repeat(student.StarGrade), inline: true },
+			{ name: '\u200b', value: '\u200b', inline: true },
 			{ name: 'School', value: localization['School'][student.School], inline: true },
+			{ name: 'School Year', value: student.SchoolYear, inline: true },
 			{ name: 'Club', value: localization['Club'][student.Club], inline: true },
+			{ name: 'Birthday', value: student.Birthday, inline: true },
+			{ name: 'Age', value: student.CharacterAge, inline: true },
+			{
+				name: 'Height',
+				value: `${student.CharHeightMetric} (${student.CharHeightImperial})`,
+				inline: true,
+			},
+			{ name: 'CV', value: student.CharacterVoice, inline: true },
+			{ name: 'Desiger', value: student.Designer, inline: true },
+			{ name: 'Illustrator', value: student.Illustrator, inline: true },
+		],
+		1: [
 			{
 				name: 'Squad Type',
 				value: localization['SquadType'][student.SquadType],
@@ -166,16 +191,10 @@ function embedPages(student, emotes) {
 				inline: true,
 			},
 		],
-		1: [
-			{
-				name: 'page',
-				value: '1',
-			},
-		],
 		2: [
 			{
 				name: 'page',
-				value: '2',
+				value: '3',
 			},
 		],
 	};
