@@ -136,6 +136,7 @@ function embedPages(student, emotes) {
 			{ name: 'CV', value: student.CharacterVoice, inline: true },
 			{ name: 'Desiger', value: student.Designer, inline: true },
 			{ name: 'Illustrator', value: student.Illustrator, inline: true },
+			{ name: 'Hobbies', value: student.Hobby },
 		],
 		1: [
 			{
