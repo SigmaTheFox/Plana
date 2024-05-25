@@ -429,8 +429,6 @@ function getSkills(skills, type, level) {
 		weaponpassive: localization['ui']['student_skill_weaponpassive'],
 		sub: localization['ui']['student_skill_sub'],
 	};
-	let param1Regex = /<\?1>/g,
-		param2Regex = /<\?2>/g;
 
 	let skill = skills.find(skill => skill['SkillType'] === type),
 		skillPage = {
@@ -438,9 +436,8 @@ function getSkills(skills, type, level) {
 			fields: [],
 		};
 
-	let description = skill['Desc'].replace(param1Regex, `[2;31m${skill['Parameters'][0][level]}[0m`);
-	if (testSkillParameters(description, 2))
-		description = description.replace(param2Regex, `[2;31m${skill['Parameters'][1][level]}[0m`);
+	let description = replaceSkillParameterText(skill, level);
+	description = replaceSkillStatText(description);
 
 	skillPage.fields.push({
 		name: `${skill['Name']} Lvl ${level + 1}`,
@@ -450,6 +447,39 @@ function getSkills(skills, type, level) {
 	return skillPage;
 }
 
-function testSkillParameters(description, parameterNum) {
-	return RegExp(`<\\?${parameterNum}>`).test(description);
+function replaceSkillParameterText(skill, level) {
+	let param1Regex = /<\?1>/g,
+		param2Regex = /<\?2>/g;
+
+	let description = skill['Desc'];
+
+	description = description.replace(param1Regex, `[2;31m${skill['Parameters'][0][level]}[0m`);
+	if (/<\?2>/.test(description))
+		description = description.replace(param2Regex, `[2;31m${skill['Parameters'][1][level]}[0m`);
+
+	if (/<kb:1>/.test(description)) description = description.replace(/<kb:1>/g, '40');
+
+	return description;
+}
+
+function replaceSkillStatText(description) {
+	let desc = description;
+	let letterAssign = {
+		b: 'Buff',
+		d: 'Debuff',
+		c: 'CC',
+		s: 'Special',
+	};
+	let matches = [...description.matchAll(/<(?<statType>b|d|c|s):(?<statName>\w*)>/g)];
+
+	for (let match of matches) {
+		desc = desc.replaceAll(
+			match[0],
+			localization['BuffName'][
+				`${letterAssign[match.groups.statType]}_${match.groups.statName}`
+			]
+		);
+	}
+
+	return desc;
 }
