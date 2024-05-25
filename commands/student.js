@@ -91,9 +91,9 @@ module.exports = {
 			],
 			components: [
 				new ActionRowBuilder().addComponents([forwardButton]),
-				new ActionRowBuilder().addComponents(exLevelMenu),
-				new ActionRowBuilder().addComponents(skillLevelMenu),
-				new ActionRowBuilder().addComponents(gearToggle),
+				new ActionRowBuilder().addComponents(exLevelMenu.setDisabled(true)),
+				new ActionRowBuilder().addComponents(skillLevelMenu.setDisabled(true)),
+				new ActionRowBuilder().addComponents(gearToggle.setDisabled(true)),
 			],
 		});
 
