@@ -60,16 +60,19 @@ module.exports = {
 	 * @param {CommandInteraction} interaction
 	 */
 	async execute(bot, interaction) {
+		// Switch emote style if the command is being used in a server without the Use External Emojis permission
 		let emotes;
 		if (interaction.inCachedGuild() && interaction.appPermissions.has(UseExternalEmojis))
 			emotes = emotesList.serverInstall;
 		else emotes = emotesList.userInstall;
 
+		// Get the student the user input in the command
 		const userInputStudent = interaction.options.getString('name', true);
 		const student = students.find(
 			student => student.Name.toLowerCase() === userInputStudent.toLowerCase()
 		);
 
+		// Get the student level if the user set one, otherwide default to level 1
 		student.Level = interaction.options.getInteger('level') || 1;
 
 		const embed = new EmbedBuilder()
@@ -81,6 +84,7 @@ module.exports = {
 				iconURL: `https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/${student.Id}.webp`,
 			});
 
+		// Send the first page and assign the forward button alongside the 3 dropdown menus
 		const msg = await interaction.reply({
 			embeds: [
 				embed
@@ -97,6 +101,7 @@ module.exports = {
 			],
 		});
 
+		// Initialize component collector
 		let filter = ({ user }) => user.id === interaction.user.id;
 		let collector = msg.createMessageComponentCollector({
 			filter,
@@ -110,6 +115,7 @@ module.exports = {
 		};
 		let gear = false;
 		collector.on('collect', async interaction => {
+			// collect select menu interactions
 			if (interaction.isAnySelectMenu()) {
 				if (interaction.customId === 'exlevel')
 					skills.exLevel = Number(interaction.values[0]);
@@ -118,6 +124,7 @@ module.exports = {
 				if (interaction.customId === 'geartoggle') gear = !!Number(interaction.values[0]);
 			}
 
+			// collect button interactions and change page accordingly
 			if (interaction.isButton()) {
 				if (interaction.customId === 'back') {
 					pageIndex -= 1;
@@ -132,6 +139,7 @@ module.exports = {
 				}
 			}
 
+			// update the replied embed with the new page
 			await interaction.update({
 				embeds: [
 					embed
@@ -172,6 +180,7 @@ module.exports = {
 	},
 };
 
+// pre-define the embed pages
 function embedPages(student, emotes, skills = {}, gear = false) {
 	const pages = {
 		0: {
@@ -387,6 +396,7 @@ function embedPages(student, emotes, skills = {}, gear = false) {
 	return pages;
 }
 
+// calculate the student stats based on the level and stars
 function calculateStat(stat, stat1, stat100, level, stars = 1, statGrowthType = 'Standard') {
 	let levelScale;
 	switch (statGrowthType) {
@@ -420,6 +430,7 @@ function calculateStat(stat, stat1, stat100, level, stars = 1, statGrowthType = 
 	).toString();
 }
 
+// create the skill page
 function getSkills(skills, type, level) {
 	let words = {
 		ex: localization['ui']['student_skill_ex'],
@@ -453,10 +464,12 @@ function replaceSkillParameterText(skill, level) {
 
 	let description = skill['Desc'];
 
+	// replace placeholders with the appropriate parameter
 	description = description.replace(param1Regex, `[2;31m${skill['Parameters'][0][level]}[0m`);
 	if (/<\?2>/.test(description))
 		description = description.replace(param2Regex, `[2;31m${skill['Parameters'][1][level]}[0m`);
 
+	// assign value 40 to the placeholder for knockback
 	if (/<kb:1>/.test(description)) description = description.replace(/<kb:1>/g, '40');
 
 	return description;
@@ -472,6 +485,7 @@ function replaceSkillStatText(description) {
 	};
 	let matches = [...description.matchAll(/<(?<statType>b|d|c|s):(?<statName>\w*)>/g)];
 
+	// replace bugg/debuff/cc/special placeholder text with appropriate names
 	for (let match of matches) {
 		desc = desc.replaceAll(
 			match[0],
