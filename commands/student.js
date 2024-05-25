@@ -166,8 +166,10 @@ module.exports = {
 							: skillLevelMenu.setDisabled(true),
 					]),
 					new ActionRowBuilder().addComponents([
-						(pageIndex === 4 || pageIndex === 5) &&
+						pageIndex === 4 &&
 						student['Skills'].find(skill => skill.SkillType === 'gearnormal')
+							? gearToggle.setDisabled(false)
+							: pageIndex === 5
 							? gearToggle.setDisabled(false)
 							: gearToggle.setDisabled(true),
 					]),
