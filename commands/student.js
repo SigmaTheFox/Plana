@@ -465,9 +465,9 @@ function replaceSkillParameterText(skill, level) {
 	let description = skill['Desc'];
 
 	// replace placeholders with the appropriate parameter
-	description = description.replace(param1Regex, `[2;31m${skill['Parameters'][0][level]}[0m`);
+	description = description.replace(param1Regex, `[2;31m${skill['Parameters']?.[0]?.[level]}[0m`);
 	if (/<\?2>/.test(description))
-		description = description.replace(param2Regex, `[2;31m${skill['Parameters'][1][level]}[0m`);
+		description = description.replace(param2Regex, `[2;31m${skill['Parameters']?.[1]?.[level]}[0m`);
 
 	// assign value 40 to the placeholder for knockback
 	if (/<kb:1>/.test(description)) description = description.replace(/<kb:1>/g, '40');
