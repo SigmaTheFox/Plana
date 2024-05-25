@@ -378,12 +378,10 @@ function embedPages(student, emotes, skills = {}, gear = false) {
 				},
 			],
 		},
-		3: getSkills(student['Skills'], 'ex', skills.exLevel).skillPage,
-		4: getSkills(student['Skills'], gear ? 'gearnormal' : 'normal', skills.skillLevel)
-			.skillPage,
-		5: getSkills(student['Skills'], gear ? 'weaponpassive' : 'passive', skills.skillLevel)
-			.skillPage,
-		6: getSkills(student['Skills'], 'sub', skills.skillLevel).skillPage,
+		3: getSkills(student['Skills'], 'ex', skills.exLevel),
+		4: getSkills(student['Skills'], gear ? 'gearnormal' : 'normal', skills.skillLevel),
+		5: getSkills(student['Skills'], gear ? 'weaponpassive' : 'passive', skills.skillLevel),
+		6: getSkills(student['Skills'], 'sub', skills.skillLevel),
 	};
 
 	return pages;
@@ -449,7 +447,7 @@ function getSkills(skills, type, level) {
 		value: '```ansi\n' + description + '```',
 	});
 
-	return { skillPage };
+	return skillPage;
 }
 
 function testSkillParameters(description, parameterNum) {
