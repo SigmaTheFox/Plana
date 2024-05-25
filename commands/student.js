@@ -4,11 +4,17 @@ const {
 	CommandInteraction,
 	EmbedBuilder,
 	AutocompleteInteraction,
-	ButtonBuilder,
-	ButtonStyle,
 	ActionRowBuilder,
 	PermissionFlagsBits: { UseExternalEmojis },
 } = require('discord.js');
+
+const {
+	backButton,
+	forwardButton,
+	exLevelMenu,
+	skillLevelMenu,
+	gearToggle,
+} = require('../modules/actionRows');
 const { readFileSync } = require('fs');
 
 const emotesList = require('../json/emotes.json');
@@ -59,17 +65,6 @@ module.exports = {
 			emotes = emotesList.serverInstall;
 		else emotes = emotesList.userInstall;
 
-		const backButton = new ButtonBuilder()
-			.setStyle(ButtonStyle.Secondary)
-			.setLabel('Back')
-			.setEmoji('⬅️')
-			.setCustomId('back');
-		const forwardButton = new ButtonBuilder()
-			.setStyle(ButtonStyle.Secondary)
-			.setLabel('Forwards')
-			.setEmoji('➡️')
-			.setCustomId('forward');
-
 		const userInputStudent = interaction.options.getString('name', true);
 		const student = students.find(
 			student => student.Name.toLowerCase() === userInputStudent.toLowerCase()
@@ -94,7 +89,12 @@ module.exports = {
 					.setFooter({ text: 'Page 1' })
 					.setDescription(student.ProfileIntroduction),
 			],
-			components: [new ActionRowBuilder().addComponents([forwardButton])],
+			components: [
+				new ActionRowBuilder().addComponents([forwardButton]),
+				new ActionRowBuilder().addComponents(exLevelMenu),
+				new ActionRowBuilder().addComponents(skillLevelMenu),
+				new ActionRowBuilder().addComponents(gearToggle),
+			],
 		});
 
 		let filter = ({ user }) => user.id === interaction.user.id;
@@ -104,20 +104,64 @@ module.exports = {
 		});
 
 		let pageIndex = 0;
+		let skills = {
+			exLevel: 0,
+			skillLevel: 0,
+		};
+		let gear = false;
 		collector.on('collect', async interaction => {
-			interaction.customId === 'back' ? (pageIndex -= 1) : (pageIndex += 1);
+			if (interaction.isAnySelectMenu()) {
+				if (interaction.customId === 'exlevel')
+					skills.exLevel = Number(interaction.values[0]);
+				if (interaction.customId === 'skilllevel')
+					skills.skillLevel = Number(interaction.values[0]);
+				if (interaction.customId === 'geartoggle') gear = !!Number(interaction.values[0]);
+			}
+
+			if (interaction.isButton()) {
+				if (interaction.customId === 'back') {
+					pageIndex -= 1;
+					skills.skillLevel = 0;
+					skills.exLevel = 0;
+					gear = false;
+				} else {
+					pageIndex += 1;
+					skills.skillLevel = 0;
+					skills.exLevel = 0;
+					gear = false;
+				}
+			}
+
 			await interaction.update({
 				embeds: [
 					embed
-						.setTitle(embedPages(student, emotes)[pageIndex]['title'])
-						.setFields(embedPages(student, emotes)[pageIndex]['fields'])
+						.setTitle(embedPages(student, emotes, gear)[pageIndex]['title'])
+						.setFields(embedPages(student, emotes, skills, gear)[pageIndex]['fields'])
 						.setFooter({ text: `Page ${pageIndex + 1}` })
 						.setDescription(pageIndex === 0 ? student.ProfileIntroduction : '\u200b'),
 				],
 				components: [
 					new ActionRowBuilder().addComponents([
 						...(pageIndex ? [backButton] : []),
-						...(pageIndex + 1 < 3 ? [forwardButton] : []),
+						...(pageIndex + 1 < Object.keys(embedPages(student, emotes)).length
+							? [forwardButton]
+							: []),
+					]),
+					new ActionRowBuilder().addComponents([
+						pageIndex === 3
+							? exLevelMenu.setDisabled(false)
+							: exLevelMenu.setDisabled(true),
+					]),
+					new ActionRowBuilder().addComponents([
+						pageIndex > 3 && pageIndex < Object.keys(embedPages(student, emotes)).length
+							? skillLevelMenu.setDisabled(false)
+							: skillLevelMenu.setDisabled(true),
+					]),
+					new ActionRowBuilder().addComponents([
+						(pageIndex === 4 || pageIndex === 5) &&
+						student['Skills'].find(skill => skill.SkillType === 'gearnormal')
+							? gearToggle.setDisabled(false)
+							: gearToggle.setDisabled(true),
 					]),
 				],
 			});
@@ -128,7 +172,7 @@ module.exports = {
 	},
 };
 
-function embedPages(student, emotes) {
+function embedPages(student, emotes, skills = {}, gear = false) {
 	const pages = {
 		0: {
 			title: 'Profile',
@@ -334,6 +378,12 @@ function embedPages(student, emotes) {
 				},
 			],
 		},
+		3: getSkills(student['Skills'], 'ex', skills.exLevel).skillPage,
+		4: getSkills(student['Skills'], gear ? 'gearnormal' : 'normal', skills.skillLevel)
+			.skillPage,
+		5: getSkills(student['Skills'], gear ? 'weaponpassive' : 'passive', skills.skillLevel)
+			.skillPage,
+		6: getSkills(student['Skills'], 'sub', skills.skillLevel).skillPage,
 	};
 
 	return pages;
@@ -370,4 +420,38 @@ function calculateStat(stat, stat1, stat100, level, stars = 1, statGrowthType = 
 	return Math.ceil(
 		(Math.round((stat1 + (stat100 - stat1) * levelScale).toFixed(4)) * transcendence).toFixed(4)
 	).toString();
+}
+
+function getSkills(skills, type, level) {
+	let words = {
+		ex: localization['ui']['student_skill_ex'],
+		normal: localization['ui']['student_skill_normal'],
+		gearnormal: localization['ui']['student_skill_gearnormal'],
+		passive: localization['ui']['student_skill_passive'],
+		weaponpassive: localization['ui']['student_skill_weaponpassive'],
+		sub: localization['ui']['student_skill_sub'],
+	};
+	let param1Regex = /<\?1>/g,
+		param2Regex = /<\?2>/g;
+
+	let skill = skills.find(skill => skill['SkillType'] === type),
+		skillPage = {
+			title: words[type],
+			fields: [],
+		};
+
+	let description = skill['Desc'].replace(param1Regex, `[2;31m${skill['Parameters'][0][level]}[0m`);
+	if (testSkillParameters(description, 2))
+		description = description.replace(param2Regex, `[2;31m${skill['Parameters'][1][level]}[0m`);
+
+	skillPage.fields.push({
+		name: `${skill['Name']} Lvl ${level + 1}`,
+		value: '```ansi\n' + description + '```',
+	});
+
+	return { skillPage };
+}
+
+function testSkillParameters(description, parameterNum) {
+	return RegExp(`<\\?${parameterNum}>`).test(description);
 }
