@@ -114,8 +114,8 @@ module.exports = {
 			skillLevel: 0,
 		};
 		let gear = {
-			normal:false,
-			passive: false
+			normal: false,
+			passive: false,
 		};
 		collector.on('collect', async interaction => {
 			// collect select menu interactions
@@ -125,9 +125,11 @@ module.exports = {
 				if (interaction.customId === 'skilllevel')
 					skills.skillLevel = Number(interaction.values[0]);
 				if (interaction.customId === 'geartoggle') {
-					student['Skills'].find(skill => skill.SkillType === 'gearnormal') ? gear.normal = !!Number(interaction.values[0]) : gear.normal = false;
+					student['Skills'].find(skill => skill.SkillType === 'gearnormal')
+						? (gear.normal = !!Number(interaction.values[0]))
+						: (gear.normal = false);
 					gear.passive = !!Number(interaction.values[0]);
-				};
+				}
 			}
 
 			// collect button interactions and change page accordingly
@@ -191,7 +193,7 @@ module.exports = {
 };
 
 // pre-define the embed pages
-function embedPages(student, emotes, skills = {}, gear = { normal:false, passive: false }) {
+function embedPages(student, emotes, skills = {}, gear = { normal: false, passive: false }) {
 	const pages = {
 		0: {
 			title: 'Profile',
@@ -399,7 +401,11 @@ function embedPages(student, emotes, skills = {}, gear = { normal:false, passive
 		},
 		3: getSkills(student['Skills'], 'ex', skills.exLevel),
 		4: getSkills(student['Skills'], gear.normal ? 'gearnormal' : 'normal', skills.skillLevel),
-		5: getSkills(student['Skills'], gear.passive ? 'weaponpassive' : 'passive', skills.skillLevel),
+		5: getSkills(
+			student['Skills'],
+			gear.passive ? 'weaponpassive' : 'passive',
+			skills.skillLevel
+		),
 		6: getSkills(student['Skills'], 'sub', skills.skillLevel),
 	};
 
