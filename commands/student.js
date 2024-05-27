@@ -475,18 +475,20 @@ function getSkills(skills, type, level) {
 }
 
 function replaceSkillParameterText(skill, level) {
-	let param1Regex = /<\?1>/g,
-		param2Regex = /<\?2>/g;
-
 	let description = skill['Desc'];
 
 	// replace placeholders with the appropriate parameter
-	description = description.replace(param1Regex, `[2;31m${skill['Parameters']?.[0]?.[level]}[0m`);
+	description = description.replace(/<\?1>/g, `[2;31m${skill['Parameters']?.[0]?.[level]}[0m`);
 	if (/<\?2>/.test(description))
-		description = description.replace(param2Regex, `[2;31m${skill['Parameters']?.[1]?.[level]}[0m`);
+		description = description.replace(/<\?2>/g, `[2;31m${skill['Parameters']?.[1]?.[level]}[0m`);
+	if (/<\?3>/.test(description))
+		description = description.replace(/<\?3>/g, `[2;31m${skill['Parameters']?.[2]?.[level]}[0m`);
 
 	// assign value 40 to the placeholder for knockback
 	if (/<kb:1>/.test(description)) description = description.replace(/<kb:1>/g, '40');
+
+	if (/<b>.*<\/b>/i.test(description))
+		description = description.replace(/<b>/g, '[1;2m').replace(/<\/b>/g, '[0m');
 
 	return description;
 }
