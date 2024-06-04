@@ -15,13 +15,10 @@ const {
 	skillLevelMenu,
 	gearToggle,
 } = require('../modules/actionRows');
-const { readFileSync } = require('fs');
+
+let { localization, students, validStudentNames } = require('../modules/getData');
 
 const emotesList = require('../json/emotes.json');
-
-let localization = JSON.parse(readFileSync('./json/localization.json'));
-let students = JSON.parse(readFileSync('./json/students.json'));
-let validStudentNames = students.map(student => student.Name);
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -49,7 +46,7 @@ module.exports = {
 	 */
 	async autocomplete(bot, interaction) {
 		const focused = interaction.options.getFocused().toLowerCase();
-		const filtered = validStudentNames
+		const filtered = validStudentNames()
 			.filter(choice => choice.toLowerCase().startsWith(focused))
 			.slice(0, 24);
 		await interaction.respond(filtered.map(choice => ({ name: choice, value: choice })));
@@ -68,7 +65,7 @@ module.exports = {
 
 		// Get the student the user input in the command
 		const userInputStudent = interaction.options.getString('name', true);
-		const student = students.find(
+		const student = students().find(
 			student => student.Name.toLowerCase() === userInputStudent.toLowerCase()
 		);
 
@@ -205,9 +202,9 @@ function embedPages(student, emotes, skills = {}, gear = { normal: false, passiv
 				},
 				{ name: 'Rarity', value: '⭐'.repeat(student.StarGrade), inline: true },
 				{ name: '\u200b', value: '\u200b', inline: true },
-				{ name: 'School', value: localization['School'][student.School], inline: true },
+				{ name: 'School', value: localization()['School'][student.School], inline: true },
 				{ name: 'School Year', value: student.SchoolYear, inline: true },
-				{ name: 'Club', value: localization['Club'][student.Club], inline: true },
+				{ name: 'Club', value: localization()['Club'][student.Club], inline: true },
 				{ name: 'Birthday', value: student.Birthday, inline: true },
 				{ name: 'Age', value: student.CharacterAge, inline: true },
 				{
@@ -226,23 +223,23 @@ function embedPages(student, emotes, skills = {}, gear = { normal: false, passiv
 			fields: [
 				{
 					name: 'Squad Type',
-					value: localization['SquadType'][student.SquadType],
+					value: localization()['SquadType'][student.SquadType],
 					inline: true,
 				},
 				{
 					name: 'Role',
-					value: localization['TacticRole'][student.TacticRole],
+					value: localization()['TacticRole'][student.TacticRole],
 					inline: true,
 				},
 				{ name: 'Position', value: student.Position, inline: true },
 				{
 					name: 'Attack Type',
-					value: localization['BulletType'][student.BulletType],
+					value: localization()['BulletType'][student.BulletType],
 					inline: true,
 				},
 				{
 					name: 'Armor Type',
-					value: localization['ArmorType'][student.ArmorType],
+					value: localization()['ArmorType'][student.ArmorType],
 					inline: true,
 				},
 				{ name: '\u200b', value: '\u200b', inline: true },
@@ -449,12 +446,12 @@ function calculateStat(stat, stat1, stat100, level, stars = 1, statGrowthType = 
 // create the skill page
 function getSkills(skills, type, level) {
 	let words = {
-		ex: localization['ui']['student_skill_ex'],
-		normal: localization['ui']['student_skill_normal'],
-		gearnormal: localization['ui']['student_skill_gearnormal'],
-		passive: localization['ui']['student_skill_passive'],
-		weaponpassive: localization['ui']['student_skill_weaponpassive'],
-		sub: localization['ui']['student_skill_sub'],
+		ex: localization()['ui']['student_skill_ex'],
+		normal: localization()['ui']['student_skill_normal'],
+		gearnormal: localization()['ui']['student_skill_gearnormal'],
+		passive: localization()['ui']['student_skill_passive'],
+		weaponpassive: localization()['ui']['student_skill_weaponpassive'],
+		sub: localization()['ui']['student_skill_sub'],
 	};
 
 	let skill = skills.find(skill => skill['SkillType'] === type),
@@ -507,7 +504,7 @@ function replaceSkillStatText(description) {
 	for (let match of matches) {
 		desc = desc.replaceAll(
 			match[0],
-			localization['BuffName'][
+			localization()['BuffName'][
 				`${letterAssign[match.groups.statType]}_${match.groups.statName}`
 			]
 		);
