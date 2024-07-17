@@ -462,6 +462,7 @@ function getSkills(skills, type, level) {
 
 	let description = replaceSkillParameterText(skill, level);
 	description = replaceSkillStatText(description);
+	description = colorAttackType(description);
 
 	skillPage.fields.push({
 		name: `${skill['Name']} Lvl ${level + 1}`,
@@ -507,6 +508,31 @@ function replaceSkillStatText(description) {
 			localization()['BuffName'][
 				`${letterAssign[match.groups.statType]}_${match.groups.statName}`
 			]
+		);
+	}
+
+	return desc;
+}
+
+// Color the attack/defense types in skill descriptions
+function colorAttackType(description) {
+	let desc = description;
+	let typeColors = {
+		'ba-col-mystic': '[1;2m[1;34m',
+		'ba-col-pierce': '[1;2m[1;33m',
+		'ba-col-explosion': '[1;2m[1;31m',
+	};
+
+	const matches = [
+		...description.matchAll(
+			/<b\sclass=['"](?<typeColor>ba-col-\w*)['"]>(?<typeName>[\w\s]+)<\/b>/g
+		),
+	];
+
+	for (let match of matches) {
+		desc = desc.replaceAll(
+			match[0],
+			`${typeColors[match.groups.typeColor]}${match.groups.typeName}[0m[0m`
 		);
 	}
 
