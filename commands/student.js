@@ -469,6 +469,21 @@ function getSkills(skills, type, level) {
 		value: '```ansi\n' + description + '```',
 	});
 
+	// Handle skills that can transform
+	if (skill.ExtraSkills) {
+		let extraSkill = skill.ExtraSkills[0];
+		console.log(extraSkill);
+
+		let extraSkillDescription = replaceSkillParameterText(extraSkill, level);
+		description = replaceSkillStatText(description);
+		description = colorAttackType(description);
+
+		skillPage.fields.push({
+			name: `${extraSkill['Name']} Lvl ${level + 1}`,
+			value: '```ansi\n' + extraSkillDescription + '```',
+		});
+	}
+
 	return skillPage;
 }
 
@@ -481,6 +496,10 @@ function replaceSkillParameterText(skill, level) {
 		description = description.replace(/<\?2>/g, `[2;31m${skill['Parameters']?.[1]?.[level]}[0m`);
 	if (/<\?3>/.test(description))
 		description = description.replace(/<\?3>/g, `[2;31m${skill['Parameters']?.[2]?.[level]}[0m`);
+	if (/<\?4>/.test(description))
+		description = description.replace(/<\?4>/g, `[2;31m${skill['Parameters']?.[3]?.[level]}[0m`);
+	if (/<\?5>/.test(description))
+		description = description.replace(/<\?5>/g, `[2;31m${skill['Parameters']?.[4]?.[level]}[0m`);
 
 	// assign value 40 to the placeholder for knockback
 	if (/<kb:1>/.test(description)) description = description.replace(/<kb:1>/g, '40');
