@@ -102,7 +102,7 @@ module.exports = {
 		let filter = ({ user }) => user.id === interaction.user.id;
 		let collector = msg.createMessageComponentCollector({
 			filter,
-			time: 60000,
+			time: 120000,
 		});
 
 		let pageIndex = 0;
@@ -472,7 +472,6 @@ function getSkills(skills, type, level) {
 	// Handle skills that can transform
 	if (skill.ExtraSkills) {
 		let extraSkill = skill.ExtraSkills[0];
-		console.log(extraSkill);
 
 		let extraSkillDescription = replaceSkillParameterText(extraSkill, level);
 		description = replaceSkillStatText(description);
