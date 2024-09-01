@@ -8,8 +8,7 @@ module.exports = async () => {
 };
 
 async function students() {
-	const studentsURL =
-		'https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/data/en/students.min.json';
+	const studentsURL = 'https://schaledb.com/data/en/students.min.json';
 
 	try {
 		const students = createWriteStream('./json/students.json');
@@ -22,8 +21,7 @@ async function students() {
 }
 
 async function Localization() {
-	const localizationURL =
-		'https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/data/en/localization.min.json';
+	const localizationURL = 'https://schaledb.com/data/en/localization.min.json';
 
 	try {
 		const localization = createWriteStream('./json/localization.json');

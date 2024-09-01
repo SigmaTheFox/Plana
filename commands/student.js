@@ -65,7 +65,7 @@ module.exports = {
 
 		// Get the student the user input in the command
 		const userInputStudent = interaction.options.getString('name', true);
-		const student = students().find(
+		const student = Object.values(students()).find(
 			student => student.Name.toLowerCase() === userInputStudent.toLowerCase()
 		);
 
@@ -122,7 +122,7 @@ module.exports = {
 				if (interaction.customId === 'skilllevel')
 					skills.skillLevel = Number(interaction.values[0]);
 				if (interaction.customId === 'geartoggle') {
-					student['Skills'].find(skill => skill.SkillType === 'gearnormal')
+					Object.keys(student['Skills']).find(skill => skill === 'GearPublic')
 						? (gear.normal = !!Number(interaction.values[0]))
 						: (gear.normal = false);
 					gear.passive = !!Number(interaction.values[0]);
@@ -174,7 +174,7 @@ module.exports = {
 					]),
 					new ActionRowBuilder().addComponents([
 						pageIndex === 4 &&
-						student['Skills'].find(skill => skill.SkillType === 'gearnormal')
+						Object.keys(student['Skills']).find(skill => skill === 'GearPublic')
 							? gearToggle.setDisabled(false)
 							: pageIndex === 5
 							? gearToggle.setDisabled(false)
@@ -396,14 +396,14 @@ function embedPages(student, emotes, skills = {}, gear = { normal: false, passiv
 				},
 			],
 		},
-		3: getSkills(student['Skills'], 'ex', skills.exLevel),
-		4: getSkills(student['Skills'], gear.normal ? 'gearnormal' : 'normal', skills.skillLevel),
+		3: getSkills(student['Skills'], 'Ex', skills.exLevel),
+		4: getSkills(student['Skills'], gear.normal ? 'GearPublic' : 'Public', skills.skillLevel),
 		5: getSkills(
 			student['Skills'],
-			gear.passive ? 'weaponpassive' : 'passive',
+			gear.passive ? 'WeaponPassive' : 'Passive',
 			skills.skillLevel
 		),
-		6: getSkills(student['Skills'], 'sub', skills.skillLevel),
+		6: getSkills(student['Skills'], 'ExtraPassive', skills.skillLevel),
 	};
 
 	return pages;
@@ -445,18 +445,9 @@ function calculateStat(stat, stat1, stat100, level, stars = 1, statGrowthType = 
 
 // create the skill page
 function getSkills(skills, type, level) {
-	let words = {
-		ex: localization()['ui']['student_skill_ex'],
-		normal: localization()['ui']['student_skill_normal'],
-		gearnormal: localization()['ui']['student_skill_gearnormal'],
-		passive: localization()['ui']['student_skill_passive'],
-		weaponpassive: localization()['ui']['student_skill_weaponpassive'],
-		sub: localization()['ui']['student_skill_sub'],
-	};
-
-	let skill = skills.find(skill => skill['SkillType'] === type),
+	let skill = skills[type],
 		skillPage = {
-			title: words[type],
+			title: localization()['SkillType'][type],
 			fields: [],
 		};
 

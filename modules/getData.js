@@ -7,7 +7,7 @@ let students = () => {
 	return JSON.parse(readFileSync('./json/students.json'));
 };
 let validStudentNames = () => {
-	return students().map(student => student.Name);
+	return Object.values(students()).map(student => student.Name);
 };
 
 module.exports = {
