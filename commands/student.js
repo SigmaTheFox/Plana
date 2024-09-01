@@ -465,8 +465,8 @@ function getSkills(skills, type, level) {
 		let extraSkill = skill.ExtraSkills[0];
 
 		let extraSkillDescription = replaceSkillParameterText(extraSkill, level);
-		description = replaceSkillStatText(description);
-		description = colorAttackType(description);
+		extraSkillDescription = replaceSkillStatText(extraSkillDescription);
+		extraSkillDescription = colorAttackType(extraSkillDescription);
 
 		skillPage.fields.push({
 			name: `${extraSkill['Name']} Lvl ${level + 1}`,
